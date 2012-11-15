@@ -1,0 +1,11 @@
+<%@ jet package="level.sta" imports="util.IGenerator" class="StaLevelGen" skeleton="generator.skeleton" %>
+<% LevelBase  level=(LevelBase)argument;%>level.sta#<%=level.getName()%>#
+
+public class <%=level.getName()%> extends org.sdu.android.map.painter.level.StaticLevel{
+	public <%=level.getName() %>(){
+		super.initialize();
+		<% for (String str:level.getList()){
+		%>add(new <%=str%>());
+		<%}%>
+	}
+}

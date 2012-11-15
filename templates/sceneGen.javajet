@@ -1,0 +1,73 @@
+<%@ jet package="scene" class="SceneGen" imports="util.IGenerator util.StaGroup util.GroupCollision util.GetName java.util.List" skeleton="generator.skeleton"%>
+<% SceneBase  scene=(SceneBase)argument; GetName getName=new GetName();%>scene#<%=scene.getName()%>#
+public class <%=scene.getName()%> extends org.sdu.android.map.painter.scene.Scene
+implements org.sdu.android.map.action.CollisionEventListener,
+org.sdu.android.map.action.MapEventListener{
+
+<%for (String className: scene.getDynResource()){%>
+	<%=className%> <%=getName.newName(className)%>;
+<%}%>
+<% for (int i=0;i<scene.getCollision().size();i++){%>
+	org.sdu.android.map.action.CollisionGroup <%=getName.newName("org.sdu.android.map.action.CollisionGroup")%>;
+<%}%>
+<% for (int i=0;i<scene.getMapEvent().size();i++){%>
+	android.graphics.Point <%=getName.newName("android.graphics.Point")%>;
+<%}%>
+public void initialize(){
+
+org.sdu.android.map.painter.ground.SimpleMap map=new <%=scene.getMap()%>();
+this.setMap((org.sdu.android.map.painter.ground.SimpleMap)map);
+
+org.sdu.android.map.painter.level.DynamicLevel dynlevel=new org.sdu.android.map.painter.level.DynamicLevel();
+dynlevel.initialize();
+<% 	for (String className:scene.getDynResource()){%>
+			<%=getName.getFirstName(className)%>=new <%=className%>();
+			dynlevel.add(<%=getName.getFirstName(className)%>);
+	<%	}%>
+this.setDynLevel(dynlevel);
+
+  <% int count=0; for (GroupCollision group:scene.getCollision()){%>
+  <%String cname=getName.getNameAt("org.sdu.android.map.action.CollisionGroup",count++);%>
+  <%=cname %>=new org.sdu.android.map.action.CollisionGroup(<%=getName.getFirstName(group.getSprite1())%>,<%=getName.getFirstName(group.getSprite2())%>);
+  this.addCollisionGroup(<%=cname %>);
+	<%	}%>
+  
+  <% count=0;	for (StaGroup group:scene.getMapEvent()){%>
+  			<%String cname=getName.getNameAt("android.graphics.Point",count++);%>
+  			<%=cname %>=new android.graphics.Point(<%=group.getPoint().x%>,<%=group.getPoint().y%>);
+			map.add(<%=cname %>);
+	<%	}%>
+  setHero((org.sdu.android.sprite.Hero)<%=getName.getFirstName(scene.getHero())%>);
+	    getHero().setMap(map);
+	    
+	  
+		this.addCollisionEventListener(this);
+		this.setMel(this);
+}
+
+	public void collisionOccured(org.sdu.android.map.action.CollisionEvent event) {
+		<%List<GroupCollision> clist=scene.getCollision();%>
+		<% if (!clist.isEmpty()) {%>
+		org.sdu.android.map.action.CollisionGroup group=event.getGroup();
+		<%count=0; for (int i=0;i<clist.size();i++){ %>
+		<%if (count>0) {%>else <%}%>
+			if (group.equals(<%=getName.getNameAt("org.sdu.android.map.action.CollisionGroup",count)%>)){
+				//handle <%=clist.get(count++).getSEvent()%>
+			}
+		<%} 
+		}%>
+	}
+	
+	public void mapEventOccured(org.sdu.android.map.action.MapEvent event){	
+		<%List<StaGroup> slist=scene.getMapEvent();%>
+		<% if (!slist.isEmpty()) {%>
+		android.graphics.Point point=event.getPoint();
+		<%count=0; for (int i=0;i<slist.size();i++){ %>
+		<%if (count>0) {%>else <%}%>if (point.equals(<%=getName.getNameAt("android.graphics.Point",count)%>)){
+				//handle <%=slist.get(count++).getEvent()%>
+			}
+		<%} 
+		}%>
+	}
+}
+

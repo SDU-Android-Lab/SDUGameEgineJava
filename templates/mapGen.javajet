@@ -1,0 +1,12 @@
+<%@ jet package="map" class="MapGen" imports="util.IGenerator util.ArrayP" skeleton="generator.skeleton" %>
+<% MapBase  map=(MapBase)argument;%>map#<%=map.getName()%>#
+public class <%=map.getName()%> extends org.sdu.android.map.painter.ground.<%if (map.isAutoSearch()){%>SimpleMap<%}else{%>SearchableMap<%}%>{
+ static int [][]mapint =  <%=ArrayP.getArray2(map.getMap())%> ;
+	public <%=map.getName()%>(){
+		super( mapint,<%=map.getTileWidth()%>,<%=map.getTileHeight()%>);
+		<% if(map.hasDownLevel()){ %>this.setDownLevel(new <%=map.getStaDownLevel()%>()); <%  }%>
+		<% if(map.hasUpLevel()) { %>this.setUpLevel(new <%= map.getStaUpLevel()%>());<%  }%>
+		
+	}
+}
+
